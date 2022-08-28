@@ -20,7 +20,14 @@ import {
     signInWithPopup,
     signOut,
 } from 'firebase/auth';
-import { EAuthProvider, emptyDocument, EUserRole, IDocument, IUserInformation } from './types';
+import {
+    EAuthProvider,
+    emptyDocument,
+    EUserRole,
+    IDocument,
+    ISignedInUser,
+    IStoredUserInformation,
+} from './types';
 import { Simulate } from 'react-dom/test-utils';
 import error = Simulate.error;
 
@@ -66,7 +73,7 @@ const getDocument = async (documentId: string): Promise<IDocument> => {
 const updateDocument = async (document: IDocument, documentId: string) => {
     const docRef = doc(db, questionsCollection, documentId);
 
-    await updateDoc(docRef, document).catch(() => {
+    await updateDoc(docRef, { ...document }).catch(() => {
         console.log('Something went wrong when updating document with id:', documentId);
     });
 };
@@ -103,12 +110,12 @@ const registerWithEmailAndPassword = async (name: string, email: string, passwor
     }
     const user = userCredentials.user;
     const userInformation = {
-        uId: user.uid,
+        uid: user.uid,
         name: name,
         role: EUserRole.USER,
         authProvider: EAuthProvider.EMAIL,
         email: email,
-    } as IUserInformation;
+    } as IStoredUserInformation;
 
     await addDoc(collection(db, usersCollection), userInformation).catch(() => {
         console.log('Something went wrong when storing user information for user with name:', name);
@@ -124,17 +131,17 @@ const signInWithGoogle = async () => {
             `User credentials was ${userCredentials} after signing in with google: ${error}`
         );
     }
-    const user = userCredentials.user;
+    const user = { ...userCredentials.user } as unknown as ISignedInUser;
     const q = query(collection(db, usersCollection), where('uid', '==', user.uid));
     const userData = await getDocs(q);
     if (userData.docs.length === 0) {
         const userInformation = {
-            uId: user.uid,
+            uid: user.uid,
             name: user.name,
             role: EUserRole.USER,
             authProvider: EAuthProvider.EMAIL,
             email: user.email,
-        } as IUserInformation;
+        } as IStoredUserInformation;
 
         await addDoc(collection(db, usersCollection), userInformation).catch(() => {
             console.log(
