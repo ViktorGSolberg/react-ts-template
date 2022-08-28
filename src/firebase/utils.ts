@@ -1,4 +1,4 @@
-import {initializeApp} from 'firebase/app'
+import { initializeApp } from 'firebase/app';
 import {
     addDoc,
     collection,
@@ -9,8 +9,8 @@ import {
     getFirestore,
     query,
     updateDoc,
-    where
-} from 'firebase/firestore'
+    where,
+} from 'firebase/firestore';
 import {
     createUserWithEmailAndPassword,
     getAuth,
@@ -18,10 +18,10 @@ import {
     sendPasswordResetEmail,
     signInWithEmailAndPassword,
     signInWithPopup,
-    signOut
-} from 'firebase/auth'
-import {EAuthProvider, emptyDocument, EUserRole, IDocument, IUserInformation} from "./types";
-import {Simulate} from "react-dom/test-utils";
+    signOut,
+} from 'firebase/auth';
+import { EAuthProvider, emptyDocument, EUserRole, IDocument, IUserInformation } from './types';
+import { Simulate } from 'react-dom/test-utils';
 import error = Simulate.error;
 
 const firebaseConfig = {
@@ -30,7 +30,7 @@ const firebaseConfig = {
     projectId: import.meta.env.VITE_PROJECT_ID as string,
     storageBucket: import.meta.env.VITE_STORAGE_BUCKET as string,
     messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID as string,
-    appId: import.meta.env.VITE_APP_ID as string
+    appId: import.meta.env.VITE_APP_ID as string,
 };
 
 const questionsCollection = 'questions';
@@ -44,21 +44,23 @@ const createDocument = async (document: IDocument) => {
     const questionsRef = collection(db, questionsCollection);
     await addDoc(questionsRef, document).catch(() => {
         console.log('Something when wrong when saving document:', document);
-    })
+    });
 };
 
 const getDocument = async (documentId: string): Promise<IDocument> => {
     let document = emptyDocument;
     const docRef = doc(db, questionsCollection, documentId);
 
-    await getDoc(docRef).then((snapshot) => {
-        if (snapshot.exists()){
-            document = snapshot.data() as IDocument
-        }
-    }).catch(() => {
-        console.log('Something went wrong when fetching document with id:', documentId);
-    })
-    return document
+    await getDoc(docRef)
+        .then((snapshot) => {
+            if (snapshot.exists()) {
+                document = snapshot.data() as IDocument;
+            }
+        })
+        .catch(() => {
+            console.log('Something went wrong when fetching document with id:', documentId);
+        });
+    return document;
 };
 
 const updateDocument = async (document: IDocument, documentId: string) => {
@@ -66,8 +68,8 @@ const updateDocument = async (document: IDocument, documentId: string) => {
 
     await updateDoc(docRef, document).catch(() => {
         console.log('Something went wrong when updating document with id:', documentId);
-    })
-}
+    });
+};
 
 const deleteDocument = async (documentId: string) => {
     const docRef = doc(db, questionsCollection, documentId);
@@ -77,21 +79,27 @@ const deleteDocument = async (documentId: string) => {
     });
 };
 
-
 const getDocuments = async () => {
     const questionsRef = collection(db, questionsCollection);
 
-    await getDocs(questionsRef).catch(( ) => {
-        console.log('Something went wrong when fetching all documents.')
+    await getDocs(questionsRef).catch(() => {
+        console.log('Something went wrong when fetching all documents.');
     });
-}
+};
 
 const registerWithEmailAndPassword = async (name: string, email: string, password: string) => {
-    const userCredentials = await createUserWithEmailAndPassword(auth, email, password).catch(() => {
-        console.log('Something went wrong when registering with email and password for user with name:', name);
-    });
+    const userCredentials = await createUserWithEmailAndPassword(auth, email, password).catch(
+        () => {
+            console.log(
+                'Something went wrong when registering with email and password for user with name:',
+                name
+            );
+        }
+    );
     if (!userCredentials) {
-        throw new Error(`User credentials was ${userCredentials} after registering with email for user with name ${name}`)
+        throw new Error(
+            `User credentials was ${userCredentials} after registering with email for user with name ${name}`
+        );
     }
     const user = userCredentials.user;
     const userInformation = {
@@ -99,59 +107,65 @@ const registerWithEmailAndPassword = async (name: string, email: string, passwor
         name: name,
         role: EUserRole.USER,
         authProvider: EAuthProvider.EMAIL,
-        email: email
-    } as IUserInformation
+        email: email,
+    } as IUserInformation;
 
     await addDoc(collection(db, usersCollection), userInformation).catch(() => {
         console.log('Something went wrong when storing user information for user with name:', name);
-    })
+    });
 };
 
 const signInWithGoogle = async () => {
-        const userCredentials = await signInWithPopup(auth, googleProvider).catch((e) => {
-            console.log('Something went wrong when signing with google:', e);
-        });
-        if (!userCredentials) {
-            throw new Error(`User credentials was ${userCredentials} after signing in with google: ${error}`)
-        }
-        const user = userCredentials.user;
-        const q = query(collection(db, usersCollection), where('uid', '==', user.uid));
-        const userData = await getDocs(q);
-        if (userData.docs.length === 0) {
-            const userInformation = {
-                uId: user.uid,
-                name: user.name,
-                role: EUserRole.USER,
-                authProvider: EAuthProvider.EMAIL,
-                email: user.email
-            } as IUserInformation
+    const userCredentials = await signInWithPopup(auth, googleProvider).catch((e) => {
+        console.log('Something went wrong when signing with google:', e);
+    });
+    if (!userCredentials) {
+        throw new Error(
+            `User credentials was ${userCredentials} after signing in with google: ${error}`
+        );
+    }
+    const user = userCredentials.user;
+    const q = query(collection(db, usersCollection), where('uid', '==', user.uid));
+    const userData = await getDocs(q);
+    if (userData.docs.length === 0) {
+        const userInformation = {
+            uId: user.uid,
+            name: user.name,
+            role: EUserRole.USER,
+            authProvider: EAuthProvider.EMAIL,
+            email: user.email,
+        } as IUserInformation;
 
-            await addDoc(collection(db, usersCollection), userInformation).catch(() => {
-                console.log('Something went wrong when storing user information for user with name:', user.name);
-            });
-        }
+        await addDoc(collection(db, usersCollection), userInformation).catch(() => {
+            console.log(
+                'Something went wrong when storing user information for user with name:',
+                user.name
+            );
+        });
+    }
 };
 
 const logInWithEmailAndPassword = async (email: string, password: string) => {
-        await signInWithEmailAndPassword(auth, email, password).catch((e) => {
-            console.log('Something went wrong when signisng in with email:', e)
-        });
+    await signInWithEmailAndPassword(auth, email, password).catch((e) => {
+        console.log('Something went wrong when signisng in with email:', e);
+    });
 };
 
 const logOut = async () => {
     await signOut(auth).catch((e) => {
         console.log('Something went wrong when signing out:', e);
     });
-}
-
+};
 
 const sendPasswordReset = async (email: string) => {
     await sendPasswordResetEmail(auth, email).catch((e) => {
-        console.log(`Something went wrong when sending password reset to user with email ${email}. Error: ${e}`);
+        console.log(
+            `Something went wrong when sending password reset to user with email ${email}. Error: ${e}`
+        );
     });
 };
 
-export {    
+export {
     createDocument,
     getDocument,
     updateDocument,
@@ -161,6 +175,5 @@ export {
     signInWithGoogle,
     logInWithEmailAndPassword,
     logOut,
-    sendPasswordReset
+    sendPasswordReset,
 };
-
