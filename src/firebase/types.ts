@@ -36,4 +36,4 @@ export const authProviderToString: Record<EAuthProvider, string> = {
     GOOGLE: 'google',
 };
 
-export const emptyDocument = { content: '' } as IDocument;
+export const emptyDocument = { title: '', content: '' } as IDocument;
