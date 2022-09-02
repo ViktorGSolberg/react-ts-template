@@ -49,6 +49,10 @@ const firebaseConfig = {
     appId: isDevelopment ? import.meta.env.APP_ID : (import.meta.env.VITE_APP_ID as string),
 };
 
+console.log(import.meta.env.ENV);
+console.log(import.meta.env.API_KEY);
+console.log(import.meta.env.AUTH_DOMAIN);
+
 const questionsCollection = 'questions';
 const usersCollection = 'users';
 const app = initializeApp(firebaseConfig);
