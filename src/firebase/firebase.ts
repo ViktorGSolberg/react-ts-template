@@ -31,20 +31,22 @@ import {
 import { Simulate } from 'react-dom/test-utils';
 import error = Simulate.error;
 
-const isDevelopment = process.env.ENV === 'dev';
+const isDevelopment = import.meta.env.ENV === 'dev';
 const firebaseConfig = {
-    apiKey: isDevelopment ? process.env.API_KEY : (import.meta.env.VITE_API_KEY as string),
+    apiKey: isDevelopment ? import.meta.env.API_KEY : (import.meta.env.VITE_API_KEY as string),
     authDomain: isDevelopment
-        ? process.env.AUTH_DOMAIN
+        ? import.meta.env.AUTH_DOMAIN
         : (import.meta.env.VITE_AUTH_DOMAIN as string),
-    projectId: isDevelopment ? process.env.PROJECT_ID : (import.meta.env.VITE_PROJECT_ID as string),
+    projectId: isDevelopment
+        ? import.meta.env.PROJECT_ID
+        : (import.meta.env.VITE_PROJECT_ID as string),
     storageBucket: isDevelopment
-        ? process.env.STORAGE_BUCKET
+        ? import.meta.env.STORAGE_BUCKET
         : (import.meta.env.VITE_STORAGE_BUCKET as string),
     messagingSenderId: isDevelopment
-        ? process.env.MESSAGING_SENDER_ID
+        ? import.meta.env.MESSAGING_SENDER_ID
         : (import.meta.env.VITE_MESSAGING_SENDER_ID as string),
-    appId: isDevelopment ? process.env.APP_ID : (import.meta.env.VITE_APP_ID as string),
+    appId: isDevelopment ? import.meta.env.APP_ID : (import.meta.env.VITE_APP_ID as string),
 };
 
 const questionsCollection = 'questions';
