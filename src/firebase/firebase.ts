@@ -31,14 +31,27 @@ import {
 import { Simulate } from 'react-dom/test-utils';
 import error = Simulate.error;
 
+const isDevelopment = import.meta.env.ENV === 'dev';
 const firebaseConfig = {
-    apiKey: import.meta.env.VITE_API_KEY as string,
-    authDomain: import.meta.env.VITE_AUTH_DOMAIN as string,
-    projectId: import.meta.env.VITE_PROJECT_ID as string,
-    storageBucket: import.meta.env.VITE_STORAGE_BUCKET as string,
-    messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID as string,
-    appId: import.meta.env.VITE_APP_ID as string,
+    apiKey: isDevelopment ? import.meta.env.API_KEY : (import.meta.env.VITE_API_KEY as string),
+    authDomain: isDevelopment
+        ? import.meta.env.AUTH_DOMAIN
+        : (import.meta.env.VITE_AUTH_DOMAIN as string),
+    projectId: isDevelopment
+        ? import.meta.env.PROJECT_ID
+        : (import.meta.env.VITE_PROJECT_ID as string),
+    storageBucket: isDevelopment
+        ? import.meta.env.STORAGE_BUCKET
+        : (import.meta.env.VITE_STORAGE_BUCKET as string),
+    messagingSenderId: isDevelopment
+        ? import.meta.env.MESSAGING_SENDER_ID
+        : (import.meta.env.VITE_MESSAGING_SENDER_ID as string),
+    appId: isDevelopment ? import.meta.env.APP_ID : (import.meta.env.VITE_APP_ID as string),
 };
+
+console.log(import.meta.env.ENV);
+console.log(import.meta.env.API_KEY);
+console.log(import.meta.env.AUTH_DOMAIN);
 
 const questionsCollection = 'questions';
 const usersCollection = 'users';
